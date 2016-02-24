@@ -180,6 +180,17 @@ def test_create_missing_ssh_key(mock_client, cluster_response):
     assert mock_client._request.call_count == 1
 
 
+def test_create_with_zone(print_table, print_single_table, mock_client,
+                          cluster_response):
+    mock_client._request.return_value = cluster_response
+
+    with patch('sys.argv', ['lava', 'clusters', 'create', 'name', 'stack_id',
+                            '--cluster-region', 'region',
+                            '--availability-zone', 'zone']):
+        main()
+        assert mock_client._request.call_count == 1
+
+
 def test_create_with_scripts(print_table, print_single_table, mock_client,
                              cluster_response):
     mock_client._request.return_value = cluster_response

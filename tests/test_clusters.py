@@ -50,7 +50,7 @@ def test_api_create(lavaclient, cluster_response):
         request.return_value = cluster_response
         resp = lavaclient.clusters.create(
             'cluster_name', 'stack_id',
-            region='region'
+            region='region', zone='zone'
         )
         assert isinstance(resp, response.ClusterDetail)
 

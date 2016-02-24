@@ -145,6 +145,7 @@ class ClusterCreateRequest(Config):
     connectors = ListField(ClusterCreateCredential)
     credentials = ListField(ClusterCreateCredential)
     region = Field(six.text_type, required=False)
+    zone = Field(six.text_type, required=False)
 
 
 class ClusterResizeRequest(Config):
@@ -278,7 +279,7 @@ class Resource(resource.Resource):
 
     def create(self, name, stack_id, username=None, ssh_keys=None,
                user_scripts=None, node_groups=None, connectors=None,
-               wait=False, credentials=None, region=None):
+               wait=False, credentials=None, region=None, zone=None):
         """
         Create a cluster
 
@@ -326,6 +327,8 @@ class Resource(resource.Resource):
 
         if region:
             data['region'] = region
+        if zone:
+            data['zone'] = zone
 
         if node_groups:
             data.update(node_groups=self._gather_node_groups(node_groups))
@@ -588,6 +591,10 @@ class Resource(resource.Resource):
             '--cluster-region',
             help='The region to create the cluster in'
         ),
+        availability_zone=argument(
+            '--availability-zone',
+            help='The availability zone for the instances'
+        ),
         wait=argument(
             action='store_true',
             help='Wait for the cluster to become active'
@@ -596,7 +603,8 @@ class Resource(resource.Resource):
     @display_table(ClusterDetail)
     def _create(self, name, stack_id, username=None, ssh_keys=None,
                 user_scripts=None, node_groups=None, connectors=None,
-                wait=False, credentials=None, cluster_region=None):
+                wait=False, credentials=None, cluster_region=None,
+                availability_zone=None):
         """
         CLI-only; cluster create command
         """
@@ -613,7 +621,8 @@ class Resource(resource.Resource):
                                connectors=connectors,
                                wait=wait,
                                credentials=credentials,
-                               region=cluster_region)
+                               region=cluster_region,
+                               zone=availability_zone)
         except error.RequestError as exc:
             if self._args.headless or not (
                     ssh_keys == [DEFAULT_SSH_KEY] and (
@@ -635,7 +644,8 @@ class Resource(resource.Resource):
                            connectors=connectors,
                            wait=wait,
                            credentials=credentials,
-                           region=cluster_region)
+                           region=cluster_region,
+                           zone=availability_zone)
 
     @command(
         parser_options=dict(
